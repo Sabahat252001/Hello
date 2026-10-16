@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subnet Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #222; }
+    .card { max-width: 520px; margin: 30px auto; background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
+    h1 { margin-top: 0; color: #c00; }
+    input, button { padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; }
+    #ip { width: 55%; }
+    #cidr { width: 60px; }
+    button { background: #c00; color: #fff; border: none; cursor: pointer; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    td { padding: 8px; border-bottom: 1px solid #eee; }
+    td:first-child { font-weight: bold; width: 45%; }
+    .error { color: #c00; margin-top: 15px; }
+    footer { text-align: center; color: #888; font-size: 13px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">Subnet Calculator</h1>
+    <input id="ip" value="192.168.10.25" placeholder="IP address"> /
+    <input id="cidr" type="number" min="0" max="32" value="24">
+    <button onclick="calculate()">Calculate</button>
+    <div id="error" class="error"></div>
+    <table id="result"></table>
+    <footer id="info"></footer>
+  </div>
+
+  <script>
+    const labels = {
+      network: 'Network', broadcast: 'Broadcast', mask: 'Subnet mask',
+      wildcard: 'Wildcard mask', firstHost: 'First host', lastHost: 'Last host',
+      totalAddresses: 'Total addresses', usableHosts: 'Usable hosts'
+    };
+
+    async function calculate() {
+      const ip = document.getElementById('ip').value.trim();
+      const cidr = document.getElementById('cidr').value;
+      const res = await fetch(`/api/subnet?ip=${encodeURIComponent(ip)}&cidr=${encodeURIComponent(cidr)}`);
+      const data = await res.json();
+      document.getElementById('error').textContent = data.error || '';
+      document.getElementById('result').innerHTML = data.error ? '' :
+        Object.keys(labels).map(k => `<tr><td>${labels[k]}</td><td>${data[k]}</td></tr>`).join('');
+    }
+
+    fetch('/api/info').then(r => r.json()).then(d => {
+      document.getElementById('title').textContent = d.title;
+      document.title = d.title;
+      document.getElementById('info').textContent = 'Served by pod: ' + d.pod;
+    });
+
+    calculate();
+  </script>
+</body>
+</html>
