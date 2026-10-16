@@ -4,7 +4,7 @@ const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const APP_TITLE = process.env.APP_TITLE || 'Subnet Calculator';
+const APP_TITLE = process.env.APP_TITLE || 'Subnet Calculator v3 - CI/CD';
 
 // Serve the HTML page from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
